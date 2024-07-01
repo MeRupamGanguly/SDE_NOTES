@@ -80,9 +80,6 @@ value := m["key"]
 mu.Unlock() // mu.RUnlock()
 
 ```
-![Screenshot from 2024-06-22 21-09-56](https://github.com/MeRupamGanguly/rupamganguly_thunderlibra/assets/162838915/d4c32cbf-e83c-45fd-952c-3d6ef6207c96)
-
-![Screenshot from 2024-06-22 21-15-11](https://github.com/MeRupamGanguly/rupamganguly_thunderlibra/assets/162838915/5db1a7a8-f9fb-4db4-a704-6b4108c36aa6)
 
 ```go
 package main
@@ -157,11 +154,6 @@ for main(){
 	consumer(ch)
 }
 ```
-![Screenshot from 2024-06-22 21-39-06](https://github.com/MeRupamGanguly/rupamganguly_thunderlibra/assets/162838915/7e15d14e-7fa7-49d2-b24d-e7b9f7433fe8)
-
-![Screenshot from 2024-06-22 21-43-00](https://github.com/MeRupamGanguly/rupamganguly_thunderlibra/assets/162838915/f69c7f2c-f7af-4ac4-82b3-5203e22463a7)
-
-![Screenshot from 2024-06-22 21-44-08](https://github.com/MeRupamGanguly/rupamganguly_thunderlibra/assets/162838915/8456b117-4278-4fd2-a436-3e8d13f2352e)
 
 ```go
 package main
@@ -235,7 +227,6 @@ func main(){
 	}
 }
 ```
-![Screenshot from 2024-06-22 22-16-13](https://github.com/MeRupamGanguly/rupamganguly_thunderlibra/assets/162838915/0e3c75dc-6c6e-497a-bf4c-5c684c06b54b)
 
 ```go
 package main
