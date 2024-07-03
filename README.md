@@ -16,10 +16,146 @@ I recently resigned in April and now seeking new and exciting career opportuniti
 
 ### Describe GoRoutine vs Thread.
 
+- Goroutines are designed for concurrency, where many tasks are handled simultaneously, often on a single thread or a small number of OS threads. Threads, on the other hand, are used for parallelism, where tasks are truly executed simultaneously on multiple CPU cores.
+
 - Goroutines are managed by the Go runtime, while threads are managed by the operating system kernel.
 - Goroutines are cheaper to create and manage than threads.
 - Goroutines communicate using channels, which are safer than shared memory used by threads.
 - Goroutine have dynamicall sized stacks managed by GORuntime, Thread have fixed-size stacks allocated by operating system.
+
+
+### Automatic Garbage Collection
+Go uses automatic garbage collection to manage memory. This means that developers do not need to explicitly allocate or deallocate memory as in languages with manual memory management. In C and C++ Developers must manually allocate memory using malloc, calloc, new, etc., and explicitly free it using free or delete when no longer needed. In contrast, C and C++ offer more control over memory but require developers to handle memory allocation, deallocation, and synchronization manually, which can lead to more complex and error-prone code. Managing threads manually in C and C++ incurs higher overhead compared to Go's lightweight goroutines. Dereferencing null pointers in C and C++ leads to undefined behavior, potentially crashing the program.
+
+### Lexical scoping
+Lexical scoping, also known as static scoping, is a principle used in programming languages to determine the scope of variables and expressions based solely on their textual placement in the source code. This means that the scope of a variable is determined by where it is declared or defined within the code structure, rather than by where it is called or used during program execution.
+
+### Closure
+Closures are useful for implementing callback mechanisms, managing state in asynchronous operations, and creating modular and reusable code blocks.  Closures encapsulate variables defined outside of their body, allowing them to retain state between calls. Closures treat functions as values that can be assigned to variables, passed as arguments, and returned from other functions. Closures in Go adhere to lexical scoping rules, meaning they access variables as they are defined in the code's lexical context. 
+ 
+```go
+package main
+
+import "fmt"
+
+func main() {
+    // Outer function that returns a closure
+    // counter is a function that returns another function (func() int).
+    counter := func() func() int {
+        count := 0
+        return func() int { // Inside counter, there's a variable count that starts at 0 and increments each time the returned function is called.
+            count++
+            return count
+        }
+    }
+
+    // Creating instances of the closure
+    // increment is assigned the result of calling counter, which is a closure that increments and returns the value of count each time it's called.
+    increment := counter()
+
+    // Using the closure multiple times
+    fmt.Println(increment()) // Output: 1
+    fmt.Println(increment()) // Output: 2
+    fmt.Println(increment()) // Output: 3
+    // When increment is called multiple times (increment()), it modifies and accesses the count variable from the outer scope.
+}
+```
+### Functional programming 
+Go (or Golang) supports functional programming paradigms through its support for higher-order functions, closures, and other functional programming concepts. Here's a simple example that demonstrates some functional programming techniques in Go:
+
+```go
+package main
+
+import (
+	"fmt"
+)
+
+// Example of a higher-order function: mapInts applies a function f to each element of a slice of integers.
+// mapInts is a higher-order function that takes a slice of integers (nums) and a function f as arguments.
+// It applies the function f to each element of nums and returns a new slice containing the transformed values.
+func mapInts(nums []int, f func(int) int) []int {
+	result := make([]int, len(nums))
+	for i, v := range nums {
+		result[i] = f(v)
+	}
+	return result
+}
+
+// Example of a function that returns a function (closure): makeAdder returns a function that adds a given value to its argument.
+// makeAdder is a function that returns a closure.
+// The closure (func(y int) int { return x + y }) captures the value x from the enclosing scope.
+// When addTen is called with an argument (addTen(5)), it adds 10 (the value captured by the closure) to the argument and returns the result.
+func makeAdder(x int) func(int) int {
+	return func(y int) int {
+		return x + y
+	}
+}
+
+func main() {
+	// Example of using mapInts with an anonymous function (lambda) to double each number in a slice.
+    // In the main function, we use an anonymous function (lambda) func(x int) int { return x * 2 } as the argument to mapInts.
+// This lambda function doubles each number in the numbers slice.
+	numbers := []int{1, 2, 3, 4, 5}
+	doubled := mapInts(numbers, func(x int) int {
+		return x * 2
+	})
+	fmt.Println("Doubled numbers:", doubled) // Output: [2 4 6 8 10]
+
+	// Example of using a closure returned by makeAdder to create an adder function that adds 10.
+	addTen := makeAdder(10)
+	fmt.Println("Adding 10 to 5:", addTen(5)) // Output: 15
+	fmt.Println("Adding 10 to 15:", addTen(15)) // Output: 25
+}
+```
+Functional programming concepts like higher-order functions (mapInts), closures (makeAdder), and anonymous functions (used as lambdas) are demonstrated.
+Go's support for passing functions as arguments (mapInts) and returning functions (makeAdder) allows for functional-style programming, promoting composability and concise code.
+
+### Using defer, panic, and recover together
+The deferred function call will be executed in Last In, First Out (LIFO) order just before the surrounding function returns. If a function panics, all deferred calls will still be executed before the panic is propagated up the call stack.
+
+panic is used to cause a runtime error and stop normal execution of the program. It is typically used when a function cannot proceed with its normal operation due to some unrecoverable error condition.
+
+recover is used to regain control of a panicking goroutine. It is only useful inside deferred functions.
+
+Together, these mechanisms provide a way to manage and recover from unexpected errors (panics) in Go programs, ensuring more robust and reliable software. They are particularly useful in handling exceptional situations where normal error handling mechanisms might not suffice or where a controlled shutdown or recovery is necessary.
+
+```go
+// 
+// Use defer to schedule recoverFromPanic immediately after doSomething starts executing.
+// Inside doSomething, use panic to halt execution and potentially trigger recoverFromPanic.
+// Inside recoverFromPanic, use recover to check if a panic occurred. If it did, handle it appropriately (such as logging an error message) and allow the program to continue executing.
+// 
+func recoverFromPanic() {
+    if r := recover(); r != nil {
+        fmt.Println("Recovered from panic:", r)
+    }
+}
+
+func doSomething() {
+    defer recoverFromPanic()
+    
+    // Potentially panicking code
+    if somethingBadHappens {
+        panic("Something bad happened")
+    }
+    
+    // Normal execution
+}
+```
+
+### Array vs Slice
+
+Arrays have a fixed size determined at compile time, while slices are dynamic and can grow or shrink.
+Arrays are value types with direct access to elements, while slices are reference types providing more flexibility and dynamic capabilities.
+Arrays are useful for fixed-size collections with known elements, whereas slices are more versatile for managing and manipulating collections whose size may change during program execution.
+
+### Method Dispatching
+Interfaces in Go specify a method set that types can implement.
+Go allows methods to be defined with either value receivers (func (v T) Method()) or pointer receivers (func (v *T) Method()).
+The choice between value and pointer receivers affects how methods mutate state and how method dispatching behaves.
+Methods in Go are essentially functions that take an explicit receiver argument.
+Go uses a mechanism called receiver type binding for method dispatching.
+
 
 ### Describe Concurrency primitives.
 
